@@ -1,0 +1,2 @@
+# streakk
+stock monitoring app
