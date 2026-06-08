@@ -502,11 +502,13 @@ if(apiKey&&activeTicker) loadTicker(activeTicker,activeRI);
 
 <script>
 if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js")
-      .then(() => console.log("Streakk SW registered"))
-      .catch(e  => console.log("SW error:", e));
-  });
+  navigator.serviceWorker.register("./sw.js", { scope: "./" })
+    .then(reg => {
+      console.log("[Streakk] SW registered, scope:", reg.scope);
+      // Force update if there's a waiting SW
+      if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
+    })
+    .catch(e => console.warn("[Streakk] SW failed:", e));
 }
 </script>
 </body>
