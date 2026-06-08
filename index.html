@@ -424,21 +424,23 @@ async function loadTicker(ticker,ri){
     </div>
 
     <div class="streak-wrap">
-      <div class="slbl" style="display:flex;align-items:center;justify-content:space-between">
-        <span>Streak History</span>
-        <span style="display:flex;align-items:center;gap:6px">
-          <span style="font-size:11px;color:var(--dim)">Show</span>
-          <select onchange="setStreakDays(this.value)" style="background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--muted);font-family:var(--fm);font-size:11px;padding:3px 6px;cursor:pointer;outline:none">
-            ${[10,20,30,50].map(n=>`<option value="${n}" ${STREAK_DAYS===n?'selected':''}>${n} days</option>`).join('')}
-            <option value="${STREAK_DAYS}" ${![10,20,30,50].includes(STREAK_DAYS)?'selected':''} style="display:${![10,20,30,50].includes(STREAK_DAYS)?'block':'none'}">${STREAK_DAYS} days</option>
-          </select>
-        </span>
-      </div>
+      <div class="slbl">Streak History</div>
       <div class="shero">
         <div class="sbadge ${sk.dir}">${sk.dir==='up'?'↑':sk.dir==='down'?'↓':'–'} ${sk.count} ${sk.count===1?'day':'days'}</div>
         <div class="smeta"><strong>${sk.dir==='up'?'Rising':sk.dir==='down'?'Falling':'Flat'}</strong> ${sk.count} session${sk.count===1?'':'s'} in a row<br>${sigH}</div>
       </div>
       <div class="dots">${dotsH}</div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:14px">
+        <span style="font-size:11px;font-family:var(--fm);color:var(--muted);letter-spacing:.06em;text-transform:uppercase">Show</span>
+        ${[10,20,30,50].map(n=>`
+          <span onclick="setStreakDays(${n})" style="
+            padding:5px 14px;border-radius:20px;font-size:12px;font-family:var(--fm);
+            cursor:pointer;transition:all .15s;user-select:none;
+            border:1px solid ${STREAK_DAYS===n?'var(--green)':'var(--border2)'};
+            background:${STREAK_DAYS===n?'var(--green-bg)':'var(--surface)'};
+            color:${STREAK_DAYS===n?'var(--green)':'var(--muted)'};"
+          >${n}d</span>`).join('')}
+      </div>
     </div>
 
     <div class="metrics">
