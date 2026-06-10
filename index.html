@@ -129,22 +129,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .rtab.active{border-color:var(--blue);color:var(--blue);background:var(--blue-bg)}
 .cwrap{position:relative;width:100%;height:240px;margin-bottom:16px}
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-@media(max-width:480px){.cgrid{grid-template-columns:1fr}}
 .ccard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px}
 .ctitle{font-size:10px;font-family:var(--fm);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
 .cswrap{position:relative;height:90px}
-
-/* 52-week proximity */
-.prox-wrap{padding:20px 0;border-bottom:1px solid var(--border)}
-.prox-bar-track{height:8px;border-radius:4px;background:var(--surface2);position:relative;margin:12px 0 6px}
-.prox-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green),var(--amber),var(--red));position:absolute;left:0;top:0}
-.prox-needle{width:3px;height:16px;border-radius:2px;background:var(--text);position:absolute;top:-4px;transform:translateX(-50%)}
-.prox-labels{display:flex;justify-content:space-between;font-size:11px;font-family:var(--fm);color:var(--muted)}
-.prox-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-.prox-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px}
-.prox-stat-lbl{font-size:11px;font-family:var(--fm);color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
-.prox-stat-val{font-size:18px;font-weight:700;letter-spacing:-.02em}
-.prox-stat-sub{font-size:12px;font-family:var(--fm);margin-top:3px}
 
 /* States */
 .stmsg{padding:48px 20px;text-align:center;color:var(--muted);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:14px;line-height:1.6}
@@ -405,25 +392,6 @@ async function loadTicker(ticker,ri){
   const revs=ri===0?reversals(entries):[];
   const sig=signal(sk,lastRSI);
 
-  // 52-week high/low — use all highs/lows from the 1Y range data if available,
-  // otherwise use max/min from current series
-  const allHighs=entries.map(e=>e.h).filter(Boolean);
-  const allLows=entries.map(e=>e.l).filter(Boolean);
-  const w52Hi=allHighs.length?Math.max(...allHighs):price;
-  const w52Lo=allLows.length?Math.min(...allLows):price;
-  const w52Range=w52Hi-w52Lo;
-  const w52Pos=w52Range>0?((price-w52Lo)/w52Range)*100:50; // 0-100% position
-  const pctFromHi=((price-w52Hi)/w52Hi)*100;
-  const pctFromLo=((price-w52Lo)/w52Lo)*100;
-
-  // Proximity signal
-  let proxSig='', proxCls='neu';
-  if(w52Pos>=90){proxSig='Near 52-week HIGH — resistance zone';proxCls='down';}
-  else if(w52Pos>=75){proxSig='Upper range — extended territory';proxCls='sig-watch';}
-  else if(w52Pos<=10){proxSig='Near 52-week LOW — potential support';proxCls='up';}
-  else if(w52Pos<=25){proxSig='Lower range — watch for bottoming';proxCls='sig-watch';}
-  else{proxSig='Mid-range — no proximity signal';proxCls='neu';}
-
   chipPcts[ticker]=changePct;
   renderWL();
   document.getElementById("upd").textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
@@ -534,13 +502,11 @@ if(apiKey&&activeTicker) loadTicker(activeTicker,activeRI);
 
 <script>
 if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js", { scope: "./" })
-    .then(reg => {
-      console.log("[Streakk] SW registered, scope:", reg.scope);
-      // Force update if there's a waiting SW
-      if (reg.waiting) reg.waiting.postMessage({ type: "SKIP_WAITING" });
-    })
-    .catch(e => console.warn("[Streakk] SW failed:", e));
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js")
+      .then(() => console.log("Streakk SW registered"))
+      .catch(e  => console.log("SW error:", e));
+  });
 }
 </script>
 </body>
