@@ -132,16 +132,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
     <span id="upd"></span>
   </div>
 
-  <div class="key-panel" id="kpanel">
-    <p><strong>One-time setup:</strong> Get a free API key at
-      <a href="https://www.alphavantage.co/support/#api-key" target="_blank">alphavantage.co</a>
-      (30 seconds, no credit card).</p>
-    <div class="key-row">
-      <input id="ki" type="text" placeholder="Paste Alpha Vantage API key..." autocomplete="off" spellcheck="false"/>
-      <button onclick="saveKey()">Save</button>
-    </div>
-  </div>
-
   <div class="add-wrap">
     <div class="add-row">
       <input id="ti" type="text" placeholder="Add ticker (e.g. TSLA)"
@@ -158,40 +148,27 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',
 
 <div class="bot">
   <button onclick="refresh()">&#8635; Refresh</button>
-  <button class="smbtn" onclick="resetKey()">Change Key</button>
 </div>
 
 <script>
-const AV="https://www.alphavantage.co/query";
+const YAHOO ="https://query1.finance.yahoo.com/v8/finance/chart/";
+const YAHOO2="https://query2.finance.yahoo.com/v8/finance/chart/";
 const RANGES=[
-  {label:"1D",fn:"TIME_SERIES_INTRADAY",iv:"5min", key:"Time Series (5min)", days:1,  fmt:"time"},
-  {label:"1W",fn:"TIME_SERIES_INTRADAY",iv:"60min",key:"Time Series (60min)",days:7,  fmt:"date"},
-  {label:"1M",fn:"TIME_SERIES_DAILY",   iv:null,   key:"Time Series (Daily)",days:30, fmt:"date"},
-  {label:"3M",fn:"TIME_SERIES_DAILY",   iv:null,   key:"Time Series (Daily)",days:90, fmt:"date"},
-  {label:"1Y",fn:"TIME_SERIES_WEEKLY",  iv:null,   key:"Weekly Time Series", days:365,fmt:"date"},
-  {label:"5Y",fn:"TIME_SERIES_MONTHLY", iv:null,   key:"Monthly Time Series",days:1825,fmt:"month"},
+  {label:"1D", range:"1d",  interval:"5m",  fmt:"time"},
+  {label:"1W", range:"5d",  interval:"30m", fmt:"date"},
+  {label:"1M", range:"1mo", interval:"1d",  fmt:"date"},
+  {label:"3M", range:"3mo", interval:"1d",  fmt:"date"},
+  {label:"1Y", range:"1y",  interval:"1wk", fmt:"date"},
+  {label:"5Y", range:"5y",  interval:"1mo", fmt:"month"},
 ];
-let apiKey="",watchlist=[],activeTicker=null,activeRI=2;
+let watchlist=[],activeTicker=null,activeRI=2;
 let chartMain=null,chartVol=null,chartRSI=null,chipPcts={};
 let STREAK_DAYS=parseInt(localStorage.getItem("streak_days")||"30");
 
 function load(){
-  try{apiKey=localStorage.getItem("av_key")||"";watchlist=JSON.parse(localStorage.getItem("sv_wl")||"[]");}catch(e){}
+  try{watchlist=JSON.parse(localStorage.getItem("sv_wl")||"[]");}catch(e){}
   if(!watchlist.length)watchlist=["AAPL","MSFT","NVDA","SPY"];
   activeTicker=watchlist[0]||null;
-  if(apiKey)document.getElementById("kpanel").style.display="none";
-}
-function saveKey(){
-  const v=document.getElementById("ki").value.trim();
-  if(!v){alert("Please paste your API key.");return;}
-  apiKey=v;try{localStorage.setItem("av_key",v);}catch(e){}
-  document.getElementById("kpanel").style.display="none";
-  renderWL();if(activeTicker)loadTicker(activeTicker,activeRI);
-}
-function resetKey(){
-  document.getElementById("kpanel").style.display="block";
-  document.getElementById("ki").value="";
-  apiKey="";try{localStorage.removeItem("av_key");}catch(e){}
 }
 function saveWL(){try{localStorage.setItem("sv_wl",JSON.stringify(watchlist));}catch(e){}}
 function setStreakDays(n){
@@ -202,8 +179,8 @@ function setStreakDays(n){
 function renderWL(){
   document.getElementById("wl").innerHTML=watchlist.map(t=>{
     const p=chipPcts[t];
-    const ps=p!=null?`<span class="cpct ${p>=0?'up':'down'}">${p>=0?'+':''}${p.toFixed(1)}%</span>`:'';
-    return `<span class="chip ${t===activeTicker?'active':''}" onclick="sel('${t}')">${t}${ps}<span class="crm" onclick="event.stopPropagation();rm('${t}')">&#x2715;</span></span>`;
+    const ps=p!=null?('<span class="cpct '+(p>=0?'up':'down')+'">'+(p>=0?'+':'')+p.toFixed(1)+'%</span>'):'';
+    return '<span class="chip '+(t===activeTicker?'active':'')+'" onclick="sel(''+t+'')">'+t+ps+'<span class="crm" onclick="event.stopPropagation();rm(''+t+'')">&#x2715;</span></span>';
   }).join('');
 }
 function addTicker(){
@@ -219,43 +196,42 @@ function rm(t){
   else document.getElementById("cnt").innerHTML='<div class="stmsg">Add a ticker above.</div>';
 }
 function sel(t){activeTicker=t;renderWL();loadTicker(t,activeRI);}
-function refresh(){if(activeTicker&&apiKey)loadTicker(activeTicker,activeRI);}
+function refresh(){if(activeTicker)loadTicker(activeTicker,activeRI);}
 function selR(i){activeRI=i;if(activeTicker)loadTicker(activeTicker,i);}
 document.getElementById("ti").addEventListener("keydown",e=>{if(e.key==="Enter")addTicker();});
 
 function fetchWithTimeout(url,ms){
   return new Promise((res,rej)=>{
     const t=setTimeout(()=>rej(new Error("Request timed out")),ms);
-    fetch(url).then(r=>{clearTimeout(t);res(r);}).catch(e=>{clearTimeout(t);rej(e);});
+    fetch(url,{cache:"no-store"}).then(r=>{clearTimeout(t);res(r);}).catch(e=>{clearTimeout(t);rej(e);});
   });
-}
-async function avFetch(params){
-  const bust=Date.now(); // unique every call — never cache stale data
-  const url=AV+"?"+new URLSearchParams({...params,apikey:apiKey,datatype:"json"})+"&_="+bust;
-  const r=await fetchWithTimeout(url,15000);
-  if(!r.ok)throw new Error("HTTP "+r.status);
-  const d=await r.json();
-  if(d["Note"])throw new Error("Rate limit hit — 25 calls/day on free tier. Try again tomorrow.");
-  if(d["Information"])throw new Error(d["Information"]);
-  if(d["Error Message"])throw new Error("Invalid ticker: "+d["Error Message"]);
-  return d;
 }
 async function fetchSeries(ticker,ri){
   const rng=RANGES[ri];
-  const params={function:rng.fn,symbol:ticker};
-  if(rng.iv){
-    params.interval=rng.iv;
-    // For intraday, request full output to get today's data
-    params.outputsize="full";
+  const bust=Date.now();
+  const qs='?range='+rng.range+'&interval='+rng.interval+'&includePrePost=false&_='+bust;
+  const urls=[YAHOO+encodeURIComponent(ticker)+qs, YAHOO2+encodeURIComponent(ticker)+qs];
+  let lastErr='Failed to fetch';
+  for(const url of urls){
+    try{
+      const r=await fetchWithTimeout(url,12000);
+      if(!r.ok)continue;
+      const d=await r.json();
+      const res=d&&d.chart&&d.chart.result&&d.chart.result[0];
+      if(!res||!res.timestamp)continue;
+      const q=res.indicators.quote[0];
+      const ts=res.timestamp;
+      const entries=[];
+      for(let i=0;i<ts.length;i++){
+        if(q.close[i]==null)continue;
+        entries.push({t:ts[i]*1000,o:q.open[i]||q.close[i],h:q.high[i]||q.close[i],l:q.low[i]||q.close[i],c:q.close[i],v:q.volume[i]||0});
+      }
+      if(!entries.length)throw new Error("No data for "+ticker);
+      entries._meta=res.meta||{};
+      return entries;
+    }catch(e){lastErr=e.message||lastErr;}
   }
-  const d=await avFetch(params);
-  const raw=d[rng.key];
-  if(!raw)throw new Error("No data for "+ticker+". Check the symbol.");
-  const cutoff=Date.now()-rng.days*864e5;
-  return Object.entries(raw)
-    .map(([k,v])=>({t:new Date(k).getTime(),o:+v["1. open"],h:+v["2. high"],l:+v["3. low"],c:+v["4. close"],v:+v["5. volume"]}))
-    .filter(e=>e.t>=cutoff)
-    .sort((a,b)=>a.t-b.t);
+  throw new Error(lastErr+' — check ticker or try again.');
 }
 function calcRSI(cl,p=14){
   if(cl.length<p+1)return cl.map(()=>50);
@@ -299,7 +275,7 @@ function getSignal(sk,rsi){
 function destroyC(){[chartMain,chartVol,chartRSI].forEach(c=>{if(c)c.destroy();});chartMain=chartVol=chartRSI=null;}
 
 async function loadTicker(ticker,ri){
-  if(!apiKey){document.getElementById("cnt").innerHTML='<div class="stmsg">Enter your API key above.</div>';return;}
+  // Yahoo Finance — no API key needed
   activeRI=ri;destroyC();
   document.getElementById("cnt").innerHTML='<div class="stmsg"><div class="spin"></div><span>Loading '+ticker+'...</span></div>';
   renderWL();
@@ -470,7 +446,7 @@ if('serviceWorker' in navigator){
     .catch(e=>console.warn('[Streakk] SW:',e));
 }
 load();renderWL();
-if(apiKey&&activeTicker)loadTicker(activeTicker,activeRI);
+if(activeTicker)loadTicker(activeTicker,activeRI);
 </script>
 </body>
 </html>
