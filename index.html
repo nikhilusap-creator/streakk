@@ -210,15 +210,22 @@ async function fetchSeries(ticker,ri){
   const rng=RANGES[ri];
   const bust=Date.now();
   const qs='?range='+rng.range+'&interval='+rng.interval+'&includePrePost=false&_='+bust;
-  const urls=[YAHOO+encodeURIComponent(ticker)+qs, YAHOO2+encodeURIComponent(ticker)+qs];
-  let lastErr='Failed to fetch';
+  const base=encodeURIComponent(ticker)+qs;
+  // Try direct first, then two CORS proxies as fallback
+  const urls=[
+    YAHOO+base,
+    YAHOO2+base,
+    'https://corsproxy.io/?url='+encodeURIComponent(YAHOO+encodeURIComponent(ticker)+'?range='+rng.range+'&interval='+rng.interval+'&includePrePost=false'),
+    'https://api.allorigins.win/raw?url='+encodeURIComponent(YAHOO+encodeURIComponent(ticker)+'?range='+rng.range+'&interval='+rng.interval+'&includePrePost=false'),
+  ];
+  const errors=[];
   for(const url of urls){
     try{
       const r=await fetchWithTimeout(url,12000);
-      if(!r.ok)continue;
+      if(!r.ok){errors.push('HTTP '+r.status);continue;}
       const d=await r.json();
       const res=d&&d.chart&&d.chart.result&&d.chart.result[0];
-      if(!res||!res.timestamp)continue;
+      if(!res||!res.timestamp){errors.push('No data in response');continue;}
       const q=res.indicators.quote[0];
       const ts=res.timestamp;
       const entries=[];
@@ -226,12 +233,12 @@ async function fetchSeries(ticker,ri){
         if(q.close[i]==null)continue;
         entries.push({t:ts[i]*1000,o:q.open[i]||q.close[i],h:q.high[i]||q.close[i],l:q.low[i]||q.close[i],c:q.close[i],v:q.volume[i]||0});
       }
-      if(!entries.length)throw new Error("No data for "+ticker);
+      if(!entries.length){errors.push('Empty entries');continue;}
       entries._meta=res.meta||{};
       return entries;
-    }catch(e){lastErr=e.message||lastErr;}
+    }catch(e){errors.push(e.message||'fetch error');}
   }
-  throw new Error(lastErr+' — check ticker or try again.');
+  throw new Error('All sources failed: '+errors.join(' | '));
 }
 function calcRSI(cl,p=14){
   if(cl.length<p+1)return cl.map(()=>50);
@@ -445,8 +452,11 @@ if('serviceWorker' in navigator){
     .then(()=>console.log('[Streakk] SW registered'))
     .catch(e=>console.warn('[Streakk] SW:',e));
 }
-load();renderWL();
-if(activeTicker)loadTicker(activeTicker,activeRI);
+load();
+document.addEventListener('DOMContentLoaded',function(){
+  renderWL();
+  if(activeTicker)loadTicker(activeTicker,activeRI);
+});
 </script>
 </body>
 </html>
