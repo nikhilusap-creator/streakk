@@ -1,5 +1,5 @@
 // Streakk Service Worker v2
-const CACHE = "streakk-v5";
+const CACHE = "streakk-v6";
 const ASSETS = [
   "./",
   "./index.html",
