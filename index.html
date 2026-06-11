@@ -312,6 +312,18 @@ async function loadTicker(ticker,ri){
     document.getElementById("cnt").innerHTML='<div class="errbox"><strong>Could not load '+ticker+'</strong><br><br>'+e.message+'</div>';
     return;
   }
+  // For streak dots we need enough bars — if STREAK_DAYS needs more data than
+  // the current range provides, fetch a wider range just for the streak calculation.
+  // 1D/1W give intraday bars (not daily), so always fetch daily for streak.
+  // 1M gives ~21 bars, 3M gives ~63, 1Y gives ~52 weekly bars.
+  var streakEntries=entries;
+  var needDailyStreak=(ri<=1); // 1D or 1W use intraday — need separate daily fetch
+  var needMoreBars=(STREAK_DAYS>21 && ri===2); // on 1M but want 30+ days
+  if(needDailyStreak||needMoreBars){
+    var streakRI=STREAK_DAYS<=21?2:STREAK_DAYS<=63?3:4; // 1M, 3M, or 1Y
+    try{streakEntries=await fetchSeries(ticker,streakRI);}
+    catch(e){streakEntries=entries;} // fallback to chart data
+  }
   if(!entries.length){
     document.getElementById("cnt").innerHTML='<div class="stmsg">No data for this range.</div>';
     return;
@@ -337,7 +349,9 @@ async function loadTicker(ticker,ri){
   else if(w52Pos>=75){proxSig="Upper range &mdash; extended territory";proxColor="var(--amber)";proxBg="var(--amber-bg)";proxBdr="rgba(255,181,71,.3)";}
   else if(w52Pos<=10){proxSig="Near 52W LOW &mdash; potential support";proxColor="var(--green)";proxBg="var(--green-bg)";proxBdr="rgba(0,212,160,.3)";}
   else if(w52Pos<=25){proxSig="Lower range &mdash; watch for bottoming";proxColor="var(--amber)";proxBg="var(--amber-bg)";proxBdr="rgba(255,181,71,.3)";}
-  var sk=calcStreak(cl);
+  // Use streakEntries (may be wider range) for the dots, chart entries for price/volume
+  var streakCl=streakEntries.map(function(e){return e.c;});
+  var sk=calcStreak(streakCl);
   var rsi=calcRSI(cl);
   var lastRSI=rsi.filter(function(v){return v!=null;}).pop()||50;
   var revs=ri===0?calcReversals(entries):[];
