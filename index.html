@@ -203,12 +203,17 @@ window.rm=rm;
 window.selR=selR;
 window.setStreakDays=setStreakDays;
 
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+
 function fetchWT(url,ms){
   return new Promise(function(res,rej){
     var t=setTimeout(function(){rej(new Error("Timeout"));},ms);
-    fetch(url,{cache:"no-store"}).then(function(r){clearTimeout(t);res(r);}).catch(function(e){clearTimeout(t);rej(e);});
+    fetch(url,{cache:"no-store",headers:{"Accept":"application/json"}})
+      .then(function(r){clearTimeout(t);res(r);})
+      .catch(function(e){clearTimeout(t);rej(e);});
   });
 }
+
 function parseYahoo(d){
   var result=d&&d.chart&&d.chart.result&&d.chart.result[0];
   if(!result||!result.timestamp) return null;
@@ -230,29 +235,45 @@ function parseYahoo(d){
   entries._meta=result.meta||{};
   return entries;
 }
+
 async function fetchSeries(ticker,ri){
   var rng=RANGES[ri];
   var bust=Date.now();
   var qs="?range="+rng.range+"&interval="+rng.interval+"&includePrePost=false&_="+bust;
-  var base="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(ticker)+"?range="+rng.range+"&interval="+rng.interval+"&includePrePost=false";
+  var base="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(ticker)
+           +"?range="+rng.range+"&interval="+rng.interval+"&includePrePost=false";
   var urls=[
-    YAHOO+encodeURIComponent(ticker)+qs,
+    YAHOO +encodeURIComponent(ticker)+qs,
     YAHOO2+encodeURIComponent(ticker)+qs,
-    PROXY1+encodeURIComponent(base),
-    PROXY2+encodeURIComponent(base)
+    "https://corsproxy.io/?url="+encodeURIComponent(base),
+    "https://api.allorigins.win/raw?url="+encodeURIComponent(base),
+    "https://thingproxy.freeboard.io/fetch/"+base,
+    "https://api.codetabs.com/v1/proxy?quest="+encodeURIComponent(base)
   ];
+  // Try each source; on 503/429 wait briefly and retry once before moving on
   var errs=[];
   for(var i=0;i<urls.length;i++){
-    try{
-      var r=await fetchWT(urls[i],12000);
-      if(!r.ok){errs.push("HTTP "+r.status);continue;}
-      var d=await r.json();
-      var entries=parseYahoo(d);
-      if(entries) return entries;
-      errs.push("empty");
-    }catch(e){errs.push(e.message||"error");}
+    for(var attempt=0;attempt<2;attempt++){
+      try{
+        if(attempt>0) await sleep(2000); // wait 2s before retry
+        var r=await fetchWT(urls[i],14000);
+        if(r.status===503||r.status===429){
+          errs.push("HTTP "+r.status+" (attempt "+(attempt+1)+")");
+          continue; // retry
+        }
+        if(!r.ok){errs.push("HTTP "+r.status);break;}
+        var d=await r.json();
+        var entries=parseYahoo(d);
+        if(entries) return entries;
+        errs.push("empty response");
+        break;
+      }catch(e){
+        errs.push(e.message||"error");
+        break;
+      }
+    }
   }
-  throw new Error("All sources failed: "+errs.join(" | "));
+  throw new Error("Could not load "+ticker+". Yahoo Finance may be temporarily unavailable — tap Refresh to try again.");
 }
 function calcRSI(cl,p){
   p=p||14;
