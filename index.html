@@ -101,200 +101,118 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:Syne,sa
 .bot{position:fixed;bottom:0;left:0;right:0;max-width:680px;margin:0 auto;padding:12px 20px 20px;background:var(--bg);border-top:1px solid var(--border);display:flex;gap:8px}
 .bot button{flex:1;padding:13px;background:var(--surface);border:1px solid var(--border2);border-radius:14px;color:var(--text);font-size:14px;font-weight:600;cursor:pointer;transition:all .15s}
 .bot button:active{transform:scale(.97)}
+.key-panel{margin:14px 20px 0;padding:14px;background:var(--amber-bg);border:1px solid rgba(255,181,71,.25);border-radius:14px}
+.key-panel p{font-size:13px;color:var(--amber);line-height:1.6;margin-bottom:10px}
+.key-panel a{color:var(--blue);text-decoration:none}
+.key-row{display:flex;gap:8px}
+.key-row input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:9px 12px;font-size:13px;font-family:DM Mono,monospace;color:var(--text);outline:none;min-width:0}
+.key-row input:focus{border-color:var(--amber)}
+.key-row button{padding:9px 14px;background:var(--amber-bg);border:1px solid var(--amber);border-radius:10px;color:var(--amber);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
 </style>
 </head>
 <body>
 <div class="app">
   <div class="hdr">
     <div class="hdr-l">
-      <img src="data:image/png;base64,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" alt="Streakk" style="height:30px;width:auto;display:block"/>
-      <div class="live-dot"></div>
-    </div>
-    <span id="upd"></span>
-  </div>
-  <div class="add-wrap">
-    <div class="add-row">
-      <input id="ti" type="text" placeholder="Add ticker (e.g. AAPL)"
-        maxlength="6" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false"
-        onkeydown="if(event.key==='Enter')addTicker()"/>
-      <button class="add-btn" onclick="addTicker()">+ Add</button>
-    </div>
-  </div>
-  <div class="wl" id="wl"></div>
-  <div class="cnt" id="cnt">
-    <div class="stmsg"><div class="spin"></div><span>Loading...</span></div>
-  </div>
-</div>
-<div class="bot">
-  <button onclick="refresh()">&#8635; Refresh</button>
-</div>
-<script>
-(function(){
-var YAHOO  = "https://query1.finance.yahoo.com/v8/finance/chart/";
-var YAHOO2 = "https://query2.finance.yahoo.com/v8/finance/chart/";
-var PROXY1 = "https://corsproxy.io/?url=";
-var PROXY2 = "https://api.allorigins.win/raw?url=";
-var RANGES = [
-  {label:"1D",range:"1d",  interval:"5m",  fmt:"time"},
-  {label:"1W",range:"5d",  interval:"30m", fmt:"date"},
-  {label:"1M",range:"1mo", interval:"1d",  fmt:"date"},
-  {label:"3M",range:"3mo", interval:"1d",  fmt:"date"},
-  {label:"1Y",range:"1y",  interval:"1wk", fmt:"date"},
-  {label:"5Y",range:"5y",  interval:"1mo", fmt:"month"}
+      <img src="data:image/png;base64,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" alt="Streakk" (function(){
+var TD = "https://api.twelvedata.com";
+var RANGES=[
+  {label:"1D",interval:"5min",  outputsize:78, fmt:"time"},
+  {label:"1W",interval:"30min", outputsize:65, fmt:"date"},
+  {label:"1M",interval:"1day",  outputsize:22, fmt:"date"},
+  {label:"3M",interval:"1day",  outputsize:65, fmt:"date"},
+  {label:"1Y",interval:"1week", outputsize:52, fmt:"date"},
+  {label:"5Y",interval:"1month",outputsize:60, fmt:"month"}
 ];
-var watchlist=[], activeTicker=null, activeRI=2;
-var chartMain=null, chartVol=null, chartRSI=null, chipPcts={};
+var watchlist=[],activeTicker=null,activeRI=2;
+var chartMain=null,chartVol=null,chartRSI=null,chipPcts={};
 var STREAK_DAYS=parseInt(localStorage.getItem("streak_days")||"30");
-
-try{watchlist=JSON.parse(localStorage.getItem("sv_wl")||"[]");}catch(e){}
-if(!watchlist.length) watchlist=["AAPL","MSFT","NVDA","SPY"];
+var API_KEY="";
+try{watchlist=JSON.parse(localStorage.getItem("sv_wl")||"[]");API_KEY=localStorage.getItem("td_key")||"";}catch(e){}
+if(!watchlist.length)watchlist=["AAPL","MSFT","NVDA","SPY"];
 activeTicker=watchlist[0]||null;
-
 function saveWL(){try{localStorage.setItem("sv_wl",JSON.stringify(watchlist));}catch(e){}}
-
 function setStreakDays(n){
   STREAK_DAYS=Math.max(5,Math.min(100,parseInt(n)||30));
   localStorage.setItem("streak_days",STREAK_DAYS);
-  if(activeTicker) loadTicker(activeTicker,activeRI);
+  if(activeTicker)loadTicker(activeTicker,activeRI);
 }
-
+function showKeyPanel(){document.getElementById("kpanel").style.display="block";}
+function hideKeyPanel(){document.getElementById("kpanel").style.display="none";}
+function submitKey(){
+  var v=document.getElementById("ki").value.trim();
+  if(!v){alert("Please paste your Twelve Data API key.");return;}
+  API_KEY=v;try{localStorage.setItem("td_key",v);}catch(e){}
+  hideKeyPanel();renderWL();
+  if(activeTicker)loadTicker(activeTicker,activeRI);
+}
 function renderWL(){
-  var el=document.getElementById("wl");
-  if(!el) return;
-  var html="";
+  var el=document.getElementById("wl");if(!el)return;
+  var out="";
   for(var i=0;i<watchlist.length;i++){
-    var t=watchlist[i];
-    var p=chipPcts[t];
+    var t=watchlist[i],p=chipPcts[t];
     var ps=(p!=null)?('<span class="cpct '+(p>=0?"up":"down")+'">'+(p>=0?"+":"")+p.toFixed(1)+"%</span>"):"";
-    html+='<span class="chip '+(t===activeTicker?"active":"")+'" onclick="sel(\''+t+'\')">'+t+ps+'<span class="crm" onclick="event.stopPropagation();rm(\''+t+'\')">&#x2715;</span></span>';
+    out+='<span class="chip '+(t===activeTicker?"active":"")+'" onclick="sel(\''+t+'\')">'+t+ps+'<span class="crm" onclick="event.stopPropagation();rm(\''+t+'\')">&#x2715;</span></span>';
   }
-  el.innerHTML=html;
+  el.innerHTML=out;
 }
-
 function addTicker(){
-  var inp=document.getElementById("ti");
-  var t=inp.value.trim().toUpperCase();
-  inp.value="";
-  if(!t) return;
+  var inp=document.getElementById("ti"),t=inp.value.trim().toUpperCase();inp.value="";
+  if(!t)return;
   for(var i=0;i<watchlist.length;i++){if(watchlist[i]===t)return;}
-  watchlist.push(t);
-  saveWL();
-  sel(t);
+  watchlist.push(t);saveWL();sel(t);
 }
 function rm(t){
-  var newWL=[];
-  for(var i=0;i<watchlist.length;i++){if(watchlist[i]!==t)newWL.push(watchlist[i]);}
-  watchlist=newWL;
-  delete chipPcts[t];
-  saveWL();
-  if(activeTicker===t) activeTicker=watchlist.length?watchlist[0]:null;
+  var n=[];for(var i=0;i<watchlist.length;i++){if(watchlist[i]!==t)n.push(watchlist[i]);}
+  watchlist=n;delete chipPcts[t];saveWL();
+  if(activeTicker===t)activeTicker=watchlist.length?watchlist[0]:null;
   renderWL();
-  if(activeTicker) loadTicker(activeTicker,activeRI);
+  if(activeTicker)loadTicker(activeTicker,activeRI);
   else document.getElementById("cnt").innerHTML='<div class="stmsg">Add a ticker above.</div>';
 }
 function sel(t){activeTicker=t;renderWL();loadTicker(t,activeRI);}
 function refresh(){if(activeTicker)loadTicker(activeTicker,activeRI);}
 function selR(i){activeRI=i;if(activeTicker)loadTicker(activeTicker,i);}
-
-window.addTicker=addTicker;
-window.refresh=refresh;
-window.sel=sel;
-window.rm=rm;
-window.selR=selR;
-window.setStreakDays=setStreakDays;
-
-function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
-
+window.addTicker=addTicker;window.refresh=refresh;window.sel=sel;
+window.rm=rm;window.selR=selR;window.setStreakDays=setStreakDays;
+window.submitKey=submitKey;window.showKeyPanel=showKeyPanel;
 function fetchWT(url,ms){
   return new Promise(function(res,rej){
     var t=setTimeout(function(){rej(new Error("Timeout"));},ms);
-    fetch(url,{cache:"no-store",headers:{"Accept":"application/json"}})
-      .then(function(r){clearTimeout(t);res(r);})
-      .catch(function(e){clearTimeout(t);rej(e);});
+    fetch(url,{cache:"no-store"}).then(function(r){clearTimeout(t);res(r);}).catch(function(e){clearTimeout(t);rej(e);});
   });
 }
-
-function parseYahoo(d){
-  var result=d&&d.chart&&d.chart.result&&d.chart.result[0];
-  if(!result||!result.timestamp) return null;
-  var q=result.indicators.quote[0];
-  var ts=result.timestamp;
+async function fetchSeries(ticker,ri){
+  if(!API_KEY)throw new Error("NO_KEY");
+  var rng=RANGES[ri];
+  var url=TD+"/time_series?symbol="+encodeURIComponent(ticker)+"&interval="+rng.interval+"&outputsize="+rng.outputsize+"&order=ASC&apikey="+API_KEY+"&_="+Date.now();
+  var r=await fetchWT(url,15000);
+  if(!r.ok)throw new Error("HTTP "+r.status);
+  var d=await r.json();
+  if(d.status==="error"||d.code===400)throw new Error(d.message||"Invalid ticker or API error");
+  if(d.code===429)throw new Error("Rate limit hit. Twelve Data free tier: 800 calls/day.");
+  if(!d.values||!d.values.length)throw new Error("No data for "+ticker+". Check the symbol.");
   var entries=[];
-  for(var i=0;i<ts.length;i++){
-    if(q.close[i]==null) continue;
-    entries.push({
-      t:ts[i]*1000,
-      o:q.open[i]||q.close[i],
-      h:q.high[i]||q.close[i],
-      l:q.low[i]||q.close[i],
-      c:q.close[i],
-      v:q.volume[i]||0
-    });
+  for(var i=0;i<d.values.length;i++){
+    var v=d.values[i];
+    entries.push({t:new Date(v.datetime).getTime(),o:parseFloat(v.open),h:parseFloat(v.high),l:parseFloat(v.low),c:parseFloat(v.close),v:parseInt(v.volume||0)});
   }
-  if(!entries.length) return null;
-  entries._meta=result.meta||{};
   return entries;
 }
-
-async function fetchSeries(ticker,ri){
-  var rng=RANGES[ri];
-  var bust=Date.now();
-  var qs="?range="+rng.range+"&interval="+rng.interval+"&includePrePost=false&_="+bust;
-  var base="https://query1.finance.yahoo.com/v8/finance/chart/"+encodeURIComponent(ticker)
-           +"?range="+rng.range+"&interval="+rng.interval+"&includePrePost=false";
-  var urls=[
-    YAHOO +encodeURIComponent(ticker)+qs,
-    YAHOO2+encodeURIComponent(ticker)+qs,
-    "https://corsproxy.io/?url="+encodeURIComponent(base),
-    "https://api.allorigins.win/raw?url="+encodeURIComponent(base),
-    "https://thingproxy.freeboard.io/fetch/"+base,
-    "https://api.codetabs.com/v1/proxy?quest="+encodeURIComponent(base)
-  ];
-  // Try each source; on 503/429 wait briefly and retry once before moving on
-  var errs=[];
-  for(var i=0;i<urls.length;i++){
-    for(var attempt=0;attempt<2;attempt++){
-      try{
-        if(attempt>0) await sleep(2000); // wait 2s before retry
-        var r=await fetchWT(urls[i],14000);
-        if(r.status===503||r.status===429){
-          errs.push("HTTP "+r.status+" (attempt "+(attempt+1)+")");
-          continue; // retry
-        }
-        if(!r.ok){errs.push("HTTP "+r.status);break;}
-        var d=await r.json();
-        var entries=parseYahoo(d);
-        if(entries) return entries;
-        errs.push("empty response");
-        break;
-      }catch(e){
-        errs.push(e.message||"error");
-        break;
-      }
-    }
-  }
-  throw new Error("Could not load "+ticker+". Yahoo Finance may be temporarily unavailable — tap Refresh to try again.");
-}
 function calcRSI(cl,p){
-  p=p||14;
-  if(cl.length<p+1) return cl.map(function(){return 50;});
+  p=p||14;if(cl.length<p+1)return cl.map(function(){return 50;});
   var gA=0,lA=0,i,d,g,l;
   for(i=1;i<=p;i++){d=cl[i]-cl[i-1];if(d>0)gA+=d;else lA-=d;}
   gA/=p;lA/=p;
-  var rsi=[];
-  for(i=0;i<p;i++) rsi.push(null);
+  var rsi=[];for(i=0;i<p;i++)rsi.push(null);
   rsi.push(lA===0?100:100-100/(1+gA/lA));
-  for(i=p+1;i<cl.length;i++){
-    d=cl[i]-cl[i-1];g=d>0?d:0;l=d<0?-d:0;
-    gA=(gA*(p-1)+g)/p;lA=(lA*(p-1)+l)/p;
-    rsi.push(lA===0?100:100-100/(1+gA/lA));
-  }
+  for(i=p+1;i<cl.length;i++){d=cl[i]-cl[i-1];g=d>0?d:0;l=d<0?-d:0;gA=(gA*(p-1)+g)/p;lA=(lA*(p-1)+l)/p;rsi.push(lA===0?100:100-100/(1+gA/lA));}
   return rsi;
 }
 function calcStreak(cl){
-  if(cl.length<2) return {count:0,dir:"flat",days:[]};
+  if(cl.length<2)return{count:0,dir:"flat",days:[]};
   var dirs=[],i;
-  for(i=1;i<cl.length;i++) dirs.push(cl[i]>cl[i-1]?"up":cl[i]<cl[i-1]?"down":"flat");
+  for(i=1;i<cl.length;i++)dirs.push(cl[i]>cl[i-1]?"up":cl[i]<cl[i-1]?"down":"flat");
   var last=dirs[dirs.length-1],n=0;
   for(i=dirs.length-1;i>=0;i--){if(dirs[i]===last)n++;else break;}
   return{count:n,dir:last,days:dirs.slice(-STREAK_DAYS)};
@@ -302,207 +220,97 @@ function calcStreak(cl){
 function calcReversals(entries){
   var rev=[],i,p,c,d;
   for(i=2;i<entries.length;i++){
-    p=entries[i-1].c-entries[i-2].c;
-    c=entries[i].c-entries[i-1].c;
-    if((p>0&&c<0)||(p<0&&c>0)){
-      d=new Date(entries[i].t);
-      rev.push({time:d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),type:c>0?"up":"down",price:entries[i].c});
-    }
+    p=entries[i-1].c-entries[i-2].c;c=entries[i].c-entries[i-1].c;
+    if((p>0&&c<0)||(p<0&&c>0)){d=new Date(entries[i].t);rev.push({time:d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}),type:c>0?"up":"down",price:entries[i].c});}
   }
   return rev.slice(-6);
 }
 function getSignal(sk,rsi){
-  if(sk.dir==="up"  &&sk.count>=4&&rsi>70) return{cls:"sig-sell",txt:"&#9888; Sell signal &mdash; long up streak + overbought RSI"};
-  if(sk.dir==="down"&&sk.count>=4&&rsi<30) return{cls:"sig-buy", txt:"&#9889; Buy signal &mdash; long down streak + oversold RSI"};
-  if(sk.dir==="up"  &&sk.count>=3)         return{cls:"sig-watch",txt:"&#128065; Watch &mdash; extended upward streak"};
-  if(sk.dir==="down"&&sk.count>=3)         return{cls:"sig-watch",txt:"&#128065; Watch &mdash; extended downward streak"};
+  if(sk.dir==="up"  &&sk.count>=4&&rsi>70)return{cls:"sig-sell",txt:"&#9888; Sell signal &mdash; long up streak + overbought RSI"};
+  if(sk.dir==="down"&&sk.count>=4&&rsi<30)return{cls:"sig-buy", txt:"&#9889; Buy signal &mdash; long down streak + oversold RSI"};
+  if(sk.dir==="up"  &&sk.count>=3)        return{cls:"sig-watch",txt:"&#128065; Watch &mdash; extended upward streak"};
+  if(sk.dir==="down"&&sk.count>=3)        return{cls:"sig-watch",txt:"&#128065; Watch &mdash; extended downward streak"};
   return null;
 }
-function destroyC(){
-  [chartMain,chartVol,chartRSI].forEach(function(c){if(c)c.destroy();});
-  chartMain=chartVol=chartRSI=null;
-}
+function destroyC(){[chartMain,chartVol,chartRSI].forEach(function(c){if(c)c.destroy();});chartMain=chartVol=chartRSI=null;}
 async function loadTicker(ticker,ri){
-  activeRI=ri;
-  destroyC();
+  if(!API_KEY){showKeyPanel();document.getElementById("cnt").innerHTML='<div class="stmsg">Enter your Twelve Data API key above.</div>';return;}
+  activeRI=ri;destroyC();
   document.getElementById("cnt").innerHTML='<div class="stmsg"><div class="spin"></div><span>Loading '+ticker+'...</span></div>';
   renderWL();
   var entries;
   try{entries=await fetchSeries(ticker,ri);}
   catch(e){
+    if(e.message==="NO_KEY"){showKeyPanel();return;}
     document.getElementById("cnt").innerHTML='<div class="errbox"><strong>Could not load '+ticker+'</strong><br><br>'+e.message+'</div>';
     return;
   }
-  // For streak dots we need enough bars — if STREAK_DAYS needs more data than
-  // the current range provides, fetch a wider range just for the streak calculation.
-  // 1D/1W give intraday bars (not daily), so always fetch daily for streak.
-  // 1M gives ~21 bars, 3M gives ~63, 1Y gives ~52 weekly bars.
-  var streakEntries=entries;
-  var needDailyStreak=(ri<=1); // 1D or 1W use intraday — need separate daily fetch
-  var needMoreBars=(STREAK_DAYS>21 && ri===2); // on 1M but want 30+ days
-  if(needDailyStreak||needMoreBars){
-    var streakRI=STREAK_DAYS<=21?2:STREAK_DAYS<=63?3:4; // 1M, 3M, or 1Y
-    try{streakEntries=await fetchSeries(ticker,streakRI);}
-    catch(e){streakEntries=entries;} // fallback to chart data
-  }
-  if(!entries.length){
-    document.getElementById("cnt").innerHTML='<div class="stmsg">No data for this range.</div>';
-    return;
-  }
-  var cl=entries.map(function(e){return e.c;});
-  var vl=entries.map(function(e){return e.v;});
-  var last=entries[entries.length-1];
-  var prev=entries[entries.length-2];
-  var price=last.c, prevClose=prev?prev.c:last.c;
-  var change=price-prevClose, changePct=(change/prevClose)*100;
-  var hiQ=last.h, loQ=last.l, lastVol=last.v||0;
+  if(!entries.length){document.getElementById("cnt").innerHTML='<div class="stmsg">No data for this range.</div>';return;}
+  var cl=entries.map(function(e){return e.c;}),vl=entries.map(function(e){return e.v;});
+  var last=entries[entries.length-1],prev=entries[entries.length-2];
+  var price=last.c,prevClose=prev?prev.c:last.c,change=price-prevClose,changePct=(change/prevClose)*100;
+  var hiQ=last.h,loQ=last.l,lastVol=last.v||0;
   var avgVol=vl.reduce(function(a,b){return a+b;},0)/vl.length;
   var allH=entries.map(function(e){return e.h;}).filter(Boolean);
   var allL=entries.map(function(e){return e.l;}).filter(Boolean);
   var w52Hi=allH.length?Math.max.apply(null,allH):price;
   var w52Lo=allL.length?Math.min.apply(null,allL):price;
-  var w52Rng=w52Hi-w52Lo;
-  var w52Pos=w52Rng>0?((price-w52Lo)/w52Rng)*100:50;
-  var pctFromHi=((price/w52Hi)-1)*100;
-  var pctFromLo=((price/w52Lo)-1)*100;
+  var w52Rng=w52Hi-w52Lo,w52Pos=w52Rng>0?((price-w52Lo)/w52Rng)*100:50;
+  var pctFromHi=((price/w52Hi)-1)*100,pctFromLo=((price/w52Lo)-1)*100;
   var proxSig="Mid-range",proxColor="var(--muted)",proxBg="var(--surface)",proxBdr="var(--border)";
   if(w52Pos>=90){proxSig="Near 52W HIGH &mdash; resistance zone";proxColor="var(--red)";proxBg="var(--red-bg)";proxBdr="rgba(255,92,107,.3)";}
   else if(w52Pos>=75){proxSig="Upper range &mdash; extended territory";proxColor="var(--amber)";proxBg="var(--amber-bg)";proxBdr="rgba(255,181,71,.3)";}
   else if(w52Pos<=10){proxSig="Near 52W LOW &mdash; potential support";proxColor="var(--green)";proxBg="var(--green-bg)";proxBdr="rgba(0,212,160,.3)";}
   else if(w52Pos<=25){proxSig="Lower range &mdash; watch for bottoming";proxColor="var(--amber)";proxBg="var(--amber-bg)";proxBdr="rgba(255,181,71,.3)";}
-  // Use streakEntries (may be wider range) for the dots, chart entries for price/volume
+  var streakEntries=entries;
+  if(STREAK_DAYS>entries.length||ri<=1){
+    var sRI=STREAK_DAYS<=22?2:STREAK_DAYS<=65?3:4;
+    try{streakEntries=await fetchSeries(ticker,sRI);}catch(e){streakEntries=entries;}
+  }
   var streakCl=streakEntries.map(function(e){return e.c;});
-  var sk=calcStreak(streakCl);
-  var rsi=calcRSI(cl);
+  var sk=calcStreak(streakCl),rsi=calcRSI(cl);
   var lastRSI=rsi.filter(function(v){return v!=null;}).pop()||50;
-  var revs=ri===0?calcReversals(entries):[];
-  var sig=getSignal(sk,lastRSI);
-  chipPcts[ticker]=changePct;
-  renderWL();
+  var revs=ri===0?calcReversals(entries):[],sig=getSignal(sk,lastRSI);
+  chipPcts[ticker]=changePct;renderWL();
   var daysSince=(Date.now()-last.t)/864e5;
   var staleNote=daysSince>4?'<div class="stale-note">Data as of '+new Date(last.t).toLocaleDateString()+' &mdash; market may be closed</div>':"";
   document.getElementById("upd").textContent=new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
   var rng=RANGES[ri];
-  var labels=entries.map(function(e){
-    var d=new Date(e.t);
-    if(rng.fmt==="time") return d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});
-    if(rng.fmt==="month") return d.toLocaleDateString([],{month:"short",year:"2-digit"});
-    return d.toLocaleDateString([],{month:"short",day:"numeric"});
-  });
+  var labels=entries.map(function(e){var d=new Date(e.t);if(rng.fmt==="time")return d.toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"});if(rng.fmt==="month")return d.toLocaleDateString([],{month:"short",year:"2-digit"});return d.toLocaleDateString([],{month:"short",day:"numeric"});});
   var rsiLbl="Neutral",rsiCls="blue";
-  if(lastRSI>70){rsiLbl="Overbought";rsiCls="down";}
-  else if(lastRSI<30){rsiLbl="Oversold";rsiCls="up";}
+  if(lastRSI>70){rsiLbl="Overbought";rsiCls="down";}else if(lastRSI<30){rsiLbl="Oversold";rsiCls="up";}
   var dotsH="";
-  for(var di=0;di<sk.days.length;di++){
-    var dv=sk.days[di];
-    dotsH+='<div class="dot '+dv+(di===sk.days.length-1?" cur":"")+'">'+
-      (dv==="up"?"&#9650;":dv==="down"?"&#9660;":"&mdash;")+"</div>";
-  }
+  for(var di=0;di<sk.days.length;di++){var dv=sk.days[di];dotsH+='<div class="dot '+dv+(di===sk.days.length-1?" cur":"")+'">'+( dv==="up"?"&#9650;":dv==="down"?"&#9660;":"&mdash;")+"</div>";}
   var sigH=sig?'<div class="ssig '+sig.cls+'">'+sig.txt+"</div>":'<span style="font-size:12px;color:var(--dim)">No strong signal yet</span>';
   var revH="";
-  if(revs.length){
-    for(var ri2=0;ri2<revs.length;ri2++){
-      var rv=revs[ri2];
-      revH+='<div class="ritem '+rv.type+'"><span class="rtime">'+rv.time+'</span><span style="font-size:13px;color:var(--muted)">'+(rv.type==="up"?"&#9650; Bounce":"&#9660; Reversal")+'</span><span class="rprice">$'+rv.price.toFixed(2)+"</span></div>";
-    }
-  }else{revH='<div class="no-rev">No intraday reversals detected</div>';}
+  if(revs.length){for(var ri2=0;ri2<revs.length;ri2++){var rv=revs[ri2];revH+='<div class="ritem '+rv.type+'"><span class="rtime">'+rv.time+'</span><span style="font-size:13px;color:var(--muted)">'+(rv.type==="up"?"&#9650; Bounce":"&#9660; Reversal")+'</span><span class="rprice">$'+rv.price.toFixed(2)+"</span></div>";}}
+  else{revH='<div class="no-rev">No intraday reversals detected</div>';}
   var needlePct=Math.max(2,Math.min(98,w52Pos));
-  var streakBtns="";
-  var snVals=[10,20,30,50];
-  for(var si=0;si<snVals.length;si++){
-    var sn=snVals[si];
-    var active=(STREAK_DAYS===sn);
-    streakBtns+='<span onclick="setStreakDays('+sn+')" style="padding:5px 14px;border-radius:20px;font-size:12px;'+
-      'font-family:DM Mono,monospace;cursor:pointer;user-select:none;'+
-      'border:1px solid '+(active?"var(--green)":"var(--border2)")+";"+
-      "background:"+(active?"var(--green-bg)":"var(--surface)")+";"+
-      "color:"+(active?"var(--green)":"var(--muted)")+'">'+sn+"d</span>";
-  }
+  var streakBtns="";var snV=[10,20,30,50];
+  for(var si=0;si<snV.length;si++){var sn=snV[si],sa=(STREAK_DAYS===sn);streakBtns+='<span onclick="setStreakDays('+sn+')" style="padding:5px 14px;border-radius:20px;font-size:12px;font-family:DM Mono,monospace;cursor:pointer;user-select:none;border:1px solid '+(sa?"var(--green)":"var(--border2)")+';background:'+(sa?"var(--green-bg)":"var(--surface)")+';color:'+(sa?"var(--green)":"var(--muted)")+'">'+sn+'d</span>';}
   var rangeTabs="";
-  for(var rti=0;rti<RANGES.length;rti++){
-    rangeTabs+='<span class="rtab '+(rti===ri?"active":"")+'" onclick="selR('+rti+')">'+RANGES[rti].label+"</span>";
-  }
+  for(var rti=0;rti<RANGES.length;rti++){rangeTabs+='<span class="rtab '+(rti===ri?"active":"")+'" onclick="selR('+rti+')">'+RANGES[rti].label+"</span>";}
   document.getElementById("cnt").innerHTML=
-    '<div class="phero">'+
-      '<div class="pname">'+ticker+"</div>"+
-      '<div class="prow">'+
-        '<span class="pbig">$'+price.toFixed(2)+"</span>"+
-        '<span class="pchg '+(change>=0?"up":"down")+'">'+(change>=0?"+":"")+change.toFixed(2)+
-        " ("+(changePct>=0?"+":"")+changePct.toFixed(2)+"%)</span>"+
-      "</div>"+staleNote+
-    "</div>"+
-    '<div class="streak-wrap">'+
-      '<div class="slbl">Streak History</div>'+
-      '<div class="shero">'+
-        '<div class="sbadge '+sk.dir+'">'+(sk.dir==="up"?"&#8593;":sk.dir==="down"?"&#8595;":"&mdash;")+
-        " "+sk.count+" "+(sk.count===1?"day":"days")+"</div>"+
-        '<div class="smeta"><strong>'+(sk.dir==="up"?"Rising":sk.dir==="down"?"Falling":"Flat")+"</strong> "+
-        sk.count+" session"+(sk.count===1?"":"s")+" in a row<br>"+sigH+"</div>"+
-      "</div>"+
-      '<div class="dots">'+dotsH+"</div>"+
-      '<div style="display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap">'+
-        '<span style="font-size:11px;font-family:DM Mono,monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Show</span>'+
-        streakBtns+
-      "</div>"+
-    "</div>"+
-    '<div class="prox-wrap">'+
-      '<div class="slbl">52-Week Position</div>'+
-      '<div class="prox-bar-track">'+
-        '<div class="prox-bar-fill"></div>'+
-        '<div class="prox-needle" style="left:'+needlePct+'%"></div>'+
-      "</div>"+
-      '<div class="prox-labels">'+
-        '<span>52W Low<br><strong style="color:var(--text)">$'+w52Lo.toFixed(2)+"</strong></span>"+
-        '<span style="text-align:center">Position<br><strong style="color:var(--text)">'+w52Pos.toFixed(0)+"%</strong></span>"+
-        '<span style="text-align:right">52W High<br><strong style="color:var(--text)">$'+w52Hi.toFixed(2)+"</strong></span>"+
-      "</div>"+
-      '<div class="prox-stats">'+
-        '<div class="prox-stat">'+
-          '<div class="prox-stat-lbl">From 52W High</div>'+
-          '<div class="prox-stat-val '+(pctFromHi>=-5?"down":"neu")+'">'+pctFromHi.toFixed(1)+"%</div>"+
-          '<div class="prox-stat-sub">'+(pctFromHi>=-2?"At or near high":pctFromHi>=-10?"Close to high":"Well below high")+"</div>"+
-        "</div>"+
-        '<div class="prox-stat">'+
-          '<div class="prox-stat-lbl">From 52W Low</div>'+
-          '<div class="prox-stat-val '+(pctFromLo<=15?"up":"neu")+'">+'+pctFromLo.toFixed(1)+"%</div>"+
-          '<div class="prox-stat-sub">'+(pctFromLo<=5?"Near the low":pctFromLo<=25?"Above the low":"Well above low")+"</div>"+
-        "</div>"+
-      "</div>"+
-      '<div class="prox-signal" style="background:'+proxBg+";border:1px solid "+proxBdr+";color:"+proxColor+'">'+proxSig+"</div>"+
-    "</div>"+
-    '<div class="metrics">'+
-      '<div class="mc"><div class="mlbl">RSI 14</div><div class="mval '+rsiCls+'">'+lastRSI.toFixed(1)+'</div><div class="msub '+rsiCls+'">'+rsiLbl+"</div></div>"+
-      '<div class="mc"><div class="mlbl">Volume</div><div class="mval">'+(lastVol>=1e6?(lastVol/1e6).toFixed(2)+"M":(lastVol/1e3).toFixed(0)+"K")+'</div><div class="msub '+(lastVol>avgVol?"up":"down")+'">'+(lastVol>avgVol?"Above":"Below")+" avg ("+(avgVol/1e6).toFixed(1)+"M)</div></div>"+
-      '<div class="mc"><div class="mlbl">Day High</div><div class="mval">$'+hiQ.toFixed(2)+'</div><div class="msub neu">Today</div></div>'+
-      '<div class="mc"><div class="mlbl">Day Low</div><div class="mval">$'+loQ.toFixed(2)+'</div><div class="msub neu">Today</div></div>'+
-    "</div>"+
-    (ri===0?'<div class="rev-wrap"><div class="slbl">Intraday Reversals</div><div class="rev-list">'+revH+"</div></div>":"")+
-    '<div class="chart-wrap">'+
-      '<div class="slbl">Price Chart</div>'+
-      '<div class="rtabs">'+rangeTabs+"</div>"+
-      '<div class="cwrap"><canvas id="cM"></canvas></div>'+
-      '<div class="cgrid">'+
-        '<div class="ccard"><div class="ctitle">Volume</div><div class="cswrap"><canvas id="cV"></canvas></div></div>'+
-        '<div class="ccard"><div class="ctitle">RSI 14 &middot; OB&gt;70 OS&lt;30</div><div class="cswrap"><canvas id="cR"></canvas></div></div>'+
-      "</div>"+
-    "</div>";
+    '<div class="phero"><div class="pname">'+ticker+'</div><div class="prow"><span class="pbig">$'+price.toFixed(2)+'</span><span class="pchg '+(change>=0?"up":"down")+'">'+(change>=0?"+":"")+change.toFixed(2)+' ('+(changePct>=0?"+":"")+changePct.toFixed(2)+'%)</span></div>'+staleNote+'</div>'+
+    '<div class="streak-wrap"><div class="slbl">Streak History</div><div class="shero"><div class="sbadge '+sk.dir+'">'+(sk.dir==="up"?"&#8593;":sk.dir==="down"?"&#8595;":"&mdash;")+' '+sk.count+' '+(sk.count===1?"day":"days")+'</div><div class="smeta"><strong>'+(sk.dir==="up"?"Rising":sk.dir==="down"?"Falling":"Flat")+'</strong> '+sk.count+' session'+(sk.count===1?"":"s")+' in a row<br>'+sigH+'</div></div><div class="dots">'+dotsH+'</div><div style="display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap"><span style="font-size:11px;font-family:DM Mono,monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em">Show</span>'+streakBtns+'</div></div>'+
+    '<div class="prox-wrap"><div class="slbl">52-Week Position</div><div class="prox-bar-track"><div class="prox-bar-fill"></div><div class="prox-needle" style="left:'+needlePct+'%"></div></div><div class="prox-labels"><span>52W Low<br><strong style="color:var(--text)">$'+w52Lo.toFixed(2)+'</strong></span><span style="text-align:center">Position<br><strong style="color:var(--text)">'+w52Pos.toFixed(0)+'%</strong></span><span style="text-align:right">52W High<br><strong style="color:var(--text)">$'+w52Hi.toFixed(2)+'</strong></span></div><div class="prox-stats"><div class="prox-stat"><div class="prox-stat-lbl">From 52W High</div><div class="prox-stat-val '+(pctFromHi>=-5?"down":"neu")+'">'+pctFromHi.toFixed(1)+'%</div><div class="prox-stat-sub">'+(pctFromHi>=-2?"At or near high":pctFromHi>=-10?"Close to high":"Well below high")+'</div></div><div class="prox-stat"><div class="prox-stat-lbl">From 52W Low</div><div class="prox-stat-val '+(pctFromLo<=15?"up":"neu")+'">+'+pctFromLo.toFixed(1)+'%</div><div class="prox-stat-sub">'+(pctFromLo<=5?"Near the low":pctFromLo<=25?"Above the low":"Well above low")+'</div></div></div><div class="prox-signal" style="background:'+proxBg+';border:1px solid '+proxBdr+';color:'+proxColor+'">'+proxSig+'</div></div>'+
+    '<div class="metrics"><div class="mc"><div class="mlbl">RSI 14</div><div class="mval '+rsiCls+'">'+lastRSI.toFixed(1)+'</div><div class="msub '+rsiCls+'">'+rsiLbl+'</div></div><div class="mc"><div class="mlbl">Volume</div><div class="mval">'+(lastVol>=1e6?(lastVol/1e6).toFixed(2)+"M":(lastVol/1e3).toFixed(0)+"K")+'</div><div class="msub '+(lastVol>avgVol?"up":"down")+'">'+(lastVol>avgVol?"Above":"Below")+' avg ('+(avgVol/1e6).toFixed(1)+'M)</div></div><div class="mc"><div class="mlbl">Day High</div><div class="mval">$'+hiQ.toFixed(2)+'</div><div class="msub neu">Today</div></div><div class="mc"><div class="mlbl">Day Low</div><div class="mval">$'+loQ.toFixed(2)+'</div><div class="msub neu">Today</div></div></div>'+
+    (ri===0?'<div class="rev-wrap"><div class="slbl">Intraday Reversals</div><div class="rev-list">'+revH+'</div></div>':'')+
+    '<div class="chart-wrap"><div class="slbl">Price Chart</div><div class="rtabs">'+rangeTabs+'</div><div class="cwrap"><canvas id="cM"></canvas></div><div class="cgrid"><div class="ccard"><div class="ctitle">Volume</div><div class="cswrap"><canvas id="cV"></canvas></div></div><div class="ccard"><div class="ctitle">RSI 14 &middot; OB&gt;70 OS&lt;30</div><div class="cswrap"><canvas id="cR"></canvas></div></div></div></div>';
   var uC="#00d4a0",dC="#ff5c6b",bC="#6c8fff",pC=change>=0?uC:dC;
   var gO={color:"rgba(255,255,255,.05)",border:{display:false}};
   var tO={color:"#7b7a8e",font:{size:10,family:"DM Mono"}};
   var ttO={backgroundColor:"#1c1c26",borderColor:"rgba(255,255,255,.1)",borderWidth:1,titleColor:"#7b7a8e",bodyColor:"#f0eff8"};
-  chartMain=new Chart(document.getElementById("cM"),{
-    type:"line",
-    data:{labels:labels,datasets:[{data:cl,borderColor:pC,borderWidth:2,pointRadius:0,tension:0.3,fill:true,
-      backgroundColor:change>=0?"rgba(0,212,160,.07)":"rgba(255,92,107,.07)"}]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},
-      plugins:{legend:{display:false},tooltip:Object.assign({},ttO,{callbacks:{label:function(c){return "$"+c.parsed.y.toFixed(2);}}})},
-      scales:{x:{ticks:Object.assign({},tO,{maxTicksLimit:7}),grid:gO,border:{display:false}},
-              y:{ticks:Object.assign({},tO,{callback:function(v){return "$"+v.toFixed(0);}}),grid:gO,border:{display:false}}}}
-  });
+  chartMain=new Chart(document.getElementById("cM"),{type:"line",data:{labels:labels,datasets:[{data:cl,borderColor:pC,borderWidth:2,pointRadius:0,tension:0.3,fill:true,backgroundColor:change>=0?"rgba(0,212,160,.07)":"rgba(255,92,107,.07)"}]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:"index",intersect:false},plugins:{legend:{display:false},tooltip:Object.assign({},ttO,{callbacks:{label:function(c){return "$"+c.parsed.y.toFixed(2);}}})},scales:{x:{ticks:Object.assign({},tO,{maxTicksLimit:7}),grid:gO,border:{display:false}},y:{ticks:Object.assign({},tO,{callback:function(v){return "$"+v.toFixed(0);}}),grid:gO,border:{display:false}}}}});
   var volC=cl.map(function(c,i){return i===0?uC:c>=cl[i-1]?uC:dC;});
-  chartVol=new Chart(document.getElementById("cV"),{
-    type:"bar",
-    data:{labels:labels,datasets:[{data:vl,backgroundColor:volC,borderWidth:0,borderRadius:2}]},
+  chartVol=new Chart(document.getElementById("cV"),{type:"bar",data:{labels:labels,datasets:[{data:vl,backgroundColor:volC,borderWidth:0,borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{ticks:Object.assign({},tO,{maxTicksLimit:3,callback:function(v){return v>=1e6?(v/1e6).toFixed(1)+"M":(v/1e3).toFixed(0)+"K";}}),grid:gO,border:{display:false}}}}});
+  chartRSI=new Chart(document.getElementById("cR"),{type:"line",data:{labels:labels,datasets:[{data:rsi,borderColor:bC,borderWidth:1.5,pointRadius:0,tension:0.2},{data:rsi.map(function(){return 70;}),borderColor:dC,borderWidth:1,borderDash:[4,3],pointRadius:0},{data:rsi.map(function(){return 30;}),borderColor:uC,borderWidth:1,borderDash:[4,3],pointRadius:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{display:false},y:{min:0,max:100,ticks:Object.assign({},tO,{stepSize:25}),grid:gO,border:{display:false}}}}});
+}
+if("serviceWorker" in navigator){navigator.serviceWorker.register("./sw.js",{scope:"./"}).then(function(){console.log("[Streakk] SW registered");}).catch(function(e){console.warn("[Streakk] SW:",e);});}
+if(!API_KEY)showKeyPanel();
+renderWL();
+if(API_KEY&&activeTicker)loadTicker(activeTicker,activeRI);
+})();Radius:2}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{display:false},y:{ticks:Object.assign({},tO,{maxTicksLimit:3,
         callback:function(v){return v>=1e6?(v/1e6).toFixed(1)+"M":(v/1e3).toFixed(0)+"K";}}),grid:gO,border:{display:false}}}}
