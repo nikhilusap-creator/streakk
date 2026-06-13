@@ -1,9 +1,10 @@
-const CACHE = "streakk-v12";
+const CACHE = "streakk-v13";
 const ASSETS = [
   "./",
   "./index.html",
   "./app.js",
   "./manifest.json",
+  "./logo.png",
   "./icon-32.png",
   "./icon-180.png",
   "./icon-192.png",
