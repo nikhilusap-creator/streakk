@@ -93,13 +93,15 @@ function calcRSI(cl,p){
   for(i=p+1;i<cl.length;i++){d=cl[i]-cl[i-1];g=d>0?d:0;l=d<0?-d:0;gA=(gA*(p-1)+g)/p;lA=(lA*(p-1)+l)/p;rsi.push(lA===0?100:100-100/(1+gA/lA));}
   return rsi;
 }
-function calcStreak(cl){
-  if(cl.length<2)return{count:0,dir:"flat",days:[]};
+function calcStreak(cl,ts){
+  if(cl.length<2)return{count:0,dir:"flat",days:[],dates:[]};
   var dirs=[],i;
   for(i=1;i<cl.length;i++)dirs.push(cl[i]>cl[i-1]?"up":cl[i]<cl[i-1]?"down":"flat");
   var last=dirs[dirs.length-1],n=0;
   for(i=dirs.length-1;i>=0;i--){if(dirs[i]===last)n++;else break;}
-  return{count:n,dir:last,days:dirs.slice(-STREAK_DAYS)};
+  // dates align with dirs (dirs[0] = change from entry[0] to entry[1], so date = entry[1])
+  var allDates=ts?ts.slice(1):dirs.map(function(){return null;});
+  return{count:n,dir:last,days:dirs.slice(-STREAK_DAYS),dates:allDates.slice(-STREAK_DAYS)};
 }
 function calcReversals(entries){
   var rev=[],i,p,c,d;
@@ -152,7 +154,8 @@ async function loadTicker(ticker,ri){
     try{streakEntries=await fetchSeries(ticker,sRI);}catch(e){streakEntries=entries;}
   }
   var streakCl=streakEntries.map(function(e){return e.c;});
-  var sk=calcStreak(streakCl),rsi=calcRSI(cl);
+  var streakTs=streakEntries.map(function(e){return e.t;});
+  var sk=calcStreak(streakCl,streakTs),rsi=calcRSI(cl);
   var lastRSI=rsi.filter(function(v){return v!=null;}).pop()||50;
   var revs=ri===0?calcReversals(entries):[],sig=getSignal(sk,lastRSI);
   chipPcts[ticker]=changePct;renderWL();
@@ -164,7 +167,15 @@ async function loadTicker(ticker,ri){
   var rsiLbl="Neutral",rsiCls="blue";
   if(lastRSI>70){rsiLbl="Overbought";rsiCls="down";}else if(lastRSI<30){rsiLbl="Oversold";rsiCls="up";}
   var dotsH="";
-  for(var di=0;di<sk.days.length;di++){var dv=sk.days[di];dotsH+='<div class="dot '+dv+(di===sk.days.length-1?" cur":"")+'">'+( dv==="up"?"^":dv==="down"?"v":"-")+"</div>";}
+  for(var di=0;di<sk.days.length;di++){
+    var dv=sk.days[di];
+    var dt=sk.dates[di]?new Date(sk.dates[di]).toLocaleDateString([],{month:"short",day:"numeric"}):"";
+    var arrow=dv==="up"?"&#9650;":dv==="down"?"&#9660;":"&#8212;";
+    var tipHtml=dt?"<span class=\"dot-tip\">"+dt+"</span>":"";
+    dotsH+="<div class=\"dot "+dv+(di===sk.days.length-1?" cur":"")+"\" title=\""+dt+"\" "+
+            "onclick=\"var s=this.getAttribute('data-show');this.setAttribute('data-show',s==='1'?'0':'1')\" "+
+            "style=\"position:relative;cursor:pointer\">"+arrow+tipHtml+"</div>";
+  }
   var sigH=sig?'<div class="ssig '+sig.cls+'">'+sig.txt+"</div>":'<span style="font-size:12px;color:var(--dim)">No strong signal yet</span>';
   var revH="";
   if(revs.length){for(var ri2=0;ri2<revs.length;ri2++){var rv=revs[ri2];revH+='<div class="ritem '+rv.type+'"><span class="rtime">'+rv.time+'</span><span style="font-size:13px;color:var(--muted)">'+(rv.type==="up"?"Bounce":"Reversal")+'</span><span class="rprice">$'+rv.price.toFixed(2)+"</span></div>";}}
