@@ -79,7 +79,12 @@ async function fetchSeries(ticker,ri){
   var entries=[];
   for(var i=0;i<d.values.length;i++){
     var v=d.values[i];
-    entries.push({t:new Date(v.datetime).getTime(),o:parseFloat(v.open),h:parseFloat(v.high),l:parseFloat(v.low),c:parseFloat(v.close),v:parseInt(v.volume||0)});
+    var et=new Date(v.datetime).getTime();
+    var eDay=new Date(et).getDay(); // 0=Sun, 6=Sat
+    if(eDay===0||eDay===6) continue; // skip weekends
+    var ec=parseFloat(v.close),eo=parseFloat(v.open);
+    if(isNaN(ec)||ec===0) continue; // skip bad data
+    entries.push({t:et,o:eo,h:parseFloat(v.high),l:parseFloat(v.low),c:ec,v:parseInt(v.volume||0)});
   }
   return entries;
 }
